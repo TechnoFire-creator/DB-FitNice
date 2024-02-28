@@ -21,11 +21,11 @@ class Club(Database):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nom VARCHAR(100) NOT NULL,
             sport VARCHAR(255) NOT NULL,
-			adresse VARCHAR(255) NOT NULL,
+			code_postal VARCHAR(255) NOT NULL,
 			description TEXT,
 			nombre_joueurs INT NOT NULL,
 			prix INT NOT NULL,
-			niveau INT
+			niveau_moy INT
         );
         """
         self.execute(table)
@@ -44,10 +44,10 @@ class Club(Database):
         @param user_data: dict (info du clubs)
         """
         try:
-            args = (user_data["nom"], user_data["sport"], user_data["adresse"],
-                    user_data.get("description",""), user_data["nombre_joueurs"], user_data["prix"],user_data.get)
+            args = (user_data["nom"], user_data["sport"], user_data["code_postal"],
+                    user_data.get("description",""), user_data["nombre_joueurs"], user_data["prix"],user_data["niveau_moy"])
             self.cursor.execute(
-                f"INSERT OR IGNORE INTO {self.table_name} ('nom','sport','adresse', 'description', 'nombre_joueurs', 'prix') VALUES (?,?,?,?,?,?)",
+                f"INSERT OR IGNORE INTO {self.table_name} ('nom','sport','code_postal', 'description', 'nombre_joueurs', 'prix','niveau_moy') VALUES (?,?,?,?,?,?,?)",
                 args)
             self.connection.commit()
         except Exception as e:
@@ -79,6 +79,47 @@ class Club(Database):
         except Exception as e:
             print(f"Error modifying user: {e}")
 
+    Fonction
+    search_clubs
+    avec
+    filtre
+    sur
+    le
+    prix
+    Python
+
+    def search_clubs(self, code_postal: str = None, niveau_min: int = 0, niveau_max: int = 3,
+                     sport: str = None, prix: int = None, prix_operator: str = None):
+        """
+        @summary: chercher des clubs selon leur code postal, sport, niveau, prix et genre
+
+        @param code_postal: str
+        @param niveau_min: int (défaut 0)
+        @param niveau_max: int (défaut 3)
+        @param sport: str
+        @param prix: int
+        @param prix_operator: str ("< ou > ou = ou >= etc)
+        @retun list: de clubs selon les filtres
+        """
+        # Construction de la clause WHERE dynamique
+        where_clauses = []
+        if code_postal:
+            where_clauses.append(f"code_postal = '{code_postal}'")
+        where_clauses.append(f"niveau BETWEEN {niveau_min} AND {niveau_max}")
+        if sport:
+            where_clauses.append(f"sport = '{sport}'")
+        if prix is not None:
+            if prix_operator not in ["<", ">", "=", "<=", ">="]:
+                raise ValueError("Opérateur de prix invalide. Les options valides sont : <, >, =, <=, >=")
+            where_clauses.append(f"prix {prix_operator} {prix}")
+
+        # Jointure des clauses WHERE avec AND
+        where_clause = " AND ".join(where_clauses) if where_clauses else "1=1"
+
+        # Execution de la requête
+        query = f"SELECT * FROM {self.table_name} WHERE {where_clause}"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
 
 # Example usage
 test = Club()
@@ -92,11 +133,3 @@ user_data = {
 }
 
 
-test.add_user(user_data)
-
-print(test.get_table())
-
-print(test.get_table())
-test.remove_user(1)
-print(test.get_table())
-test.delete_db()

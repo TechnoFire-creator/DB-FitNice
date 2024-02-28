@@ -88,7 +88,7 @@ class User(Database):
         except Exception as e:
             print(f"Error modifying user: {e}")
 
-    def search_user(self, code_postal: str = None, niveau_min: int = 0, niveau_max: int = 3, sexe: str = None):
+    def search_user(self, code_postal: str = None, niveau_min: int = 0, niveau_max: int = 3, sexe: str = None,sport:str = None):
         """
         @summary: chercher des utilisateurs selon leur code postal, sport, niveau et genre
 
@@ -96,6 +96,7 @@ class User(Database):
         @param niveau_min: int (défaut 0)
         @param niveau_max: int (défaut 3)
         @param sexe: str
+        @param sport: str
         @retun list: de utilisateur selon les filtres
         """
         # Construction de la clause WHERE dynamique
@@ -105,6 +106,8 @@ class User(Database):
         where_clauses.append(f"niveau BETWEEN {niveau_min} AND {niveau_max}")
         if sexe:
             where_clauses.append(f"sexe = '{sexe}'")
+        if sport:
+            where_clauses.append(f"sport = '{sport}'")
 
         # Jointure des clauses WHERE avec AND
         where_clause = " AND ".join(where_clauses) if where_clauses else "1=1"
@@ -114,6 +117,7 @@ class User(Database):
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
+'''
 
 # Example usage
 test = User()
@@ -162,3 +166,4 @@ test.add_user(user_data3)
 
 
 print(test.search_user(code_postal="06220",niveau_min=0,niveau_max=4))
+'''
