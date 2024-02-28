@@ -1,19 +1,26 @@
 import sqlite3
 import os
+
+
 class Database:
 
-
     def __init__(self, file_path: str):
+        """
+        Constructeur de la classe Database avec des fonctions prédéfini
 
+        @param file_path: chemin du fichier
+        @return
+        """
 
         self.file_path = file_path
         self.connection = self.connect()
         self.cursor = self.connection.cursor()
         self._isExistDB()
 
-    def _isExistDB(self):
+    def _isExistDB(self) -> None:
         """
-        On verifie on cas ou
+        Vérifier si la DB existe ou pas sinon on la créé
+        @return
         """
 
         if os.path.exists(self.file_path):
@@ -22,19 +29,18 @@ class Database:
         else:
             open(self.file_path, 'x').close()  #
 
-    def delete_db(self):
+    def delete_db(self) -> None:
         """
         Supprime la base de donnée
-        :return:
+        @return
         """
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
 
-
-    def connect(self):
+    def connect(self) -> sqlite3.Connection:
         """
         Création d'une connection à la base de donné
-        :return:
+        @return
         """
         connection = None
         try:
@@ -43,16 +49,23 @@ class Database:
         except Exception as e:
             print(e)
 
-    def get_cursor(self):
+    def get_cursor(self) -> None:
+        """
+        Création d'un cursor sql
+        @return
+        """
         if not self.connection:
             self.connect()
         if not self.cursor:
             self.cursor = self.connection.cursor()
         return self.cursor
 
-    def execute(self, statement_sql):
+    def execute(self, statement_sql: str) -> None:
         """
         Fonction qui execute des instructions sql
+
+        @param statement_sql string
+        @return
         """
 
         try:
@@ -61,9 +74,10 @@ class Database:
         except sqlite3.Error as e:
             raise sqlite3.Error(f"Impossible d'exécuter l'instruction: {e}")
 
-    def close(self):
+    def close(self) -> None:
         """
         Fermer la bd
+        @return
         """
 
         if self.connection:

@@ -1,5 +1,6 @@
 from DataBaseUtils.main import Database
 
+
 class User(Database):
     """
     Gestion de l'utilisateur
@@ -9,9 +10,10 @@ class User(Database):
         super().__init__("../../database.db")
         self.create_table_user()
 
-    def create_table_user(self):
+    def create_table_user(self) -> None:
         """
         Crée la table UserAccounts
+        @return
         """
         table = """
         CREATE TABLE IF NOT EXISTS UsersAccounts (
@@ -30,7 +32,7 @@ class User(Database):
         """
         self.execute(table)
 
-    def get_table(self):
+    def get_table(self) -> None:
         """
         Montre la table
         :return: list
@@ -38,25 +40,27 @@ class User(Database):
         self.cursor.execute("SELECT * FROM UsersAccounts")
         return self.cursor.fetchall()
 
-    def add_user(self, user_data: dict):
+    def add_user(self, user_data: dict) -> None:
         """
         Rajoute un utilisateur selon les info de la FronteEnd
-        :param user_data: dict (containing user information)
+        @param user_data: dict (info de l'utilisateur)
         """
         try:
             args = (user_data["nom"], user_data["prenom"], user_data["date_naissance"],
                     user_data["sexe"], user_data["adresse_mail"], user_data["telephone"],
                     user_data["adresse_postale"], user_data["mots_passe"],
                     user_data.get("description", ""), user_data.get("sport_pratique", ""))
-            self.cursor.execute("INSERT OR IGNORE INTO UsersAccounts ('nom','prenom','date_naissance','sexe','adresse_mail','telephone','adresse_postale','mots_passe','description','sport_pratique') VALUES (?,?,?,?,?,?,?,?,?,?)", args)
+            self.cursor.execute(
+                "INSERT OR IGNORE INTO UsersAccounts ('nom','prenom','date_naissance','sexe','adresse_mail','telephone','adresse_postale','mots_passe','description','sport_pratique') VALUES (?,?,?,?,?,?,?,?,?,?)",
+                args)
             self.connection.commit()
         except Exception as e:
             print(f"Error adding user: {e}")
 
-    def remove_user(self, user_id: int):
+    def remove_user(self, user_id: int) -> None:
         """
         Supprime l'utilisateur
-        :param user_id: int
+        @param user_id: int
         """
         try:
             self.cursor.execute("DELETE FROM UsersAccounts WHERE id = ?", (user_id,))
@@ -64,17 +68,21 @@ class User(Database):
         except Exception as e:
             print(f"Error removing user: {e}")
 
-    def modify_user(self, user_id: int, field_name: str, new_value: str):
+    def modify_user(self, user_id: int, field_name: str, new_value: str) -> None:
         """
         Modifier les données de l'utilisateur.
 
-
+        @param user_id: int (identifiant)
+        @param field_name: str (Un champ par exemple le nom)
+        @param new_value: str (Une nouvelle valeur au champ)
+        @return
         """
         try:
             self.cursor.execute(f"UPDATE UsersAccounts SET {field_name} = ? WHERE id = ?", (new_value, user_id))
             self.connection.commit()
         except Exception as e:
             print(f"Error modifying user: {e}")
+
 
 # Example usage
 test = User()
@@ -95,7 +103,8 @@ test.add_user(user_data)
 
 print(test.get_table())
 
-
 test.modify_user(1, "nom", "NewName")
+print(test.get_table())
+test.remove_user(1)
 print(test.get_table())
 test.delete_db()
