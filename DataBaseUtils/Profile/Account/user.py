@@ -1,5 +1,5 @@
 from DataBaseUtils.main import Database
-
+from friends import Friend
 
 class User(Database):
     """
@@ -9,6 +9,7 @@ class User(Database):
     def __init__(self):
         super().__init__("../../database.db")
         self.create_table_user()
+        self.table_name = "UsersAccounts"
 
     def create_table_user(self) -> None:
         """
@@ -37,7 +38,7 @@ class User(Database):
         Montre la table
         :return: list
         """
-        self.cursor.execute("SELECT * FROM UsersAccounts")
+        self.cursor.execute(f"SELECT * FROM {self.table_name}")
         return self.cursor.fetchall()
 
     def add_user(self, user_data: dict) -> None:
@@ -51,7 +52,7 @@ class User(Database):
                     user_data["adresse_postale"], user_data["mots_passe"],
                     user_data.get("description", ""), user_data.get("sport_pratique", ""))
             self.cursor.execute(
-                "INSERT OR IGNORE INTO UsersAccounts ('nom','prenom','date_naissance','sexe','adresse_mail','telephone','adresse_postale','mots_passe','description','sport_pratique') VALUES (?,?,?,?,?,?,?,?,?,?)",
+                f"INSERT OR IGNORE INTO {self.table_name} ('nom','prenom','date_naissance','sexe','adresse_mail','telephone','adresse_postale','mots_passe','description','sport_pratique') VALUES (?,?,?,?,?,?,?,?,?,?)",
                 args)
             self.connection.commit()
         except Exception as e:
@@ -63,7 +64,9 @@ class User(Database):
         @param user_id: int
         """
         try:
-            self.cursor.execute("DELETE FROM UsersAccounts WHERE id = ?", (user_id,))
+            self.cursor.execute(f"DELETE FROM {self.table_name} WHERE id = ?", (user_id,))
+            friendlink = Friend()
+            friendlink.remove_user(user_id)
             self.connection.commit()
         except Exception as e:
             print(f"Error removing user: {e}")
@@ -78,7 +81,7 @@ class User(Database):
         @return
         """
         try:
-            self.cursor.execute(f"UPDATE UsersAccounts SET {field_name} = ? WHERE id = ?", (new_value, user_id))
+            self.cursor.execute(f"UPDATE {self.table_name} SET {field_name} = ? WHERE id = ?", (new_value, user_id))
             self.connection.commit()
         except Exception as e:
             print(f"Error modifying user: {e}")
@@ -98,13 +101,27 @@ user_data = {
     "description": "testdesc",
     "sport_pratique": "Echec"
 }
-
-test.add_user(user_data)
-
-print(test.get_table())
-
-test.modify_user(1, "nom", "NewName")
-print(test.get_table())
-test.remove_user(1)
-print(test.get_table())
-test.delete_db()
+user_data2 = {
+    "nom": "TestNom2",
+    "prenom": "TestPrenom2",
+    "date_naissance": "19/06/2000",
+    "sexe": "H",
+    "adresse_mail": "test2email@gmail.com",
+    "telephone": "06 02 06 06 06 06",
+    "adresse_postale": "52 av python2",
+    "mots_passe": "BGFDJBFIUDFB222",
+    "description": "testdesc2",
+    "sport_pratique": "Echec"
+}
+user_data3 = {
+    "nom": "TestNom3",
+    "prenom": "TestPrenom3",
+    "date_naissance": "19/06/2000",
+    "sexe": "H",
+    "adresse_mail": "test3email@gmail.com",
+    "telephone": "06 02 06 06 06 06",
+    "adresse_postale": "52 av python3",
+    "mots_passe": "BGFDJBFIUDFB333",
+    "description": "testdesc3",
+    "sport_pratique": "Echec"
+}

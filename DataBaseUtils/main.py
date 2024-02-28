@@ -7,7 +7,7 @@ class Database:
     def __init__(self, file_path: str):
         """
         Constructeur de la classe Database avec des fonctions prédéfini
-
+        Conseils: supprimer le fichier à chaque exécution du code si vous voulez pas avoir les mêmes infos
         @param file_path: chemin du fichier
         @return
         """

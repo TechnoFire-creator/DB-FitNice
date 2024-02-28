@@ -90,6 +90,7 @@ user_data = {
     "prix": 45
 }
 
+
 test.add_user(user_data)
 
 print(test.get_table())
