@@ -44,7 +44,7 @@ class Friend(Database):
         @param id_user1: int (Identifiant utilisateur 1)
         @return dico contenant les amis de user
         """
-        commmand = f"SELECT * FROM Friends f INNER JOIN UsersAccounts u ON u.id = f.IDU1 WHERE f.IDU1 = {id_user1} AND f.statut = 'ami'"
+        commmand = f"SELECT * FROM Friends f INNER JOIN {self.table_name} u ON u.id = f.IDU1 WHERE f.IDU1 = {id_user1} AND f.statut = 'ami'"
         self.execute(commmand)
         results = self.cursor.fetchall()
 
@@ -62,7 +62,7 @@ class Friend(Database):
 
     def add_user(self, user_id: int,friend_id: int, date: str) -> None:
         """
-        Rajoute un lien d'amitié selon les info de la FronteEnd
+        Rajoute un lien d'amitié selon les infos de la FronteEnd
 
         @param user_id: int
         @param friend_id: int
@@ -119,4 +119,3 @@ class Friend(Database):
             self.connection.commit()
         except Exception as e:
             print(f"Error modifying friend link info: {e}")
-

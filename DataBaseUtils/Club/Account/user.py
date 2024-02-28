@@ -24,7 +24,8 @@ class Club(Database):
 			adresse VARCHAR(255) NOT NULL,
 			description TEXT,
 			nombre_joueurs INT NOT NULL,
-			prix INT NOT NULL
+			prix INT NOT NULL,
+			niveau INT
         );
         """
         self.execute(table)
@@ -39,12 +40,12 @@ class Club(Database):
 
     def add_user(self, user_data: dict) -> None:
         """
-        Rajoute un club selon les info de la FronteEnd
+        Rajoute un club selon les infos de la FronteEnd
         @param user_data: dict (info du clubs)
         """
         try:
             args = (user_data["nom"], user_data["sport"], user_data["adresse"],
-                    user_data.get("description",""), user_data["nombre_joueurs"], user_data["prix"])
+                    user_data.get("description",""), user_data["nombre_joueurs"], user_data["prix"],user_data.get)
             self.cursor.execute(
                 f"INSERT OR IGNORE INTO {self.table_name} ('nom','sport','adresse', 'description', 'nombre_joueurs', 'prix') VALUES (?,?,?,?,?,?)",
                 args)
@@ -63,9 +64,9 @@ class Club(Database):
         except Exception as e:
             print(f"Error removing club: {e}")
 
-    def modify_user(self, user_id: int, field_name: str, new_value: str) -> None:
+    def modify_club(self, user_id: int, field_name: str, new_value: str) -> None:
         """
-        Modifier les données du clubs.
+        Modifier les données des clubs.
 
         @param user_id: int (identifiant)
         @param field_name: str (Un champ par exemple le nom)
@@ -95,7 +96,6 @@ test.add_user(user_data)
 
 print(test.get_table())
 
-test.modify_user(1, "nom", "OOF")
 print(test.get_table())
 test.remove_user(1)
 print(test.get_table())
